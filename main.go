@@ -1,6 +1,8 @@
 package main
 
 import (
+	"regexp"
+	"strings"
 	"bufio"
 	"os"
 	"fmt"
@@ -8,6 +10,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/widget"
 )
+
 func readFileLBL(file_path string) {
     file, err := os.Open(file_path)
     if err != nil {
@@ -27,13 +30,34 @@ func readFileLBL(file_path string) {
             fmt.Println("Error reading file:", err)
             return
         }
-        fmt.Print(line)  // Output the line
+        parseGcodeLine(line)  // Output the line
     }
 }
 
-func parseGcode(){
-
+func removeLineNumber(input string) string {
+	// Define the regex pattern for the prefix 'N' followed by one or more digits and an optional space
+	re := regexp.MustCompile(`^N\d+\s?`)
+	// Replace the matched prefix with an empty string
+	return re.ReplaceAllString(input, "")
 }
+
+func parseGcodeLine(line string){
+	//TODO: P:0 convert string to struct
+	if strings.HasPrefix(line,"N"){
+		fmt.Println("--------------------")
+		fmt.Println("Line has line number")
+		fmt.Println("--------------------")
+		//l := removeLineNumber(line)
+		//parseGcodeLine(l)
+	} else if strings.HasPrefix(line, "G") {
+		fmt.Println("is a gcode")
+	} else if strings.HasPrefix(line,"M"){
+		fmt.Println("is a mcode")
+	} else if strings.HasPrefix(line,";"){
+		fmt.Println("is a comment")
+	}
+}
+
 func main() {
 	//Create a new app instance
 	a := app.New()
