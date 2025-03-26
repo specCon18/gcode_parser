@@ -79,12 +79,14 @@ func parseGcodeLine(line string){
 	//TODO: P:1 Write lookup table for G/M codes to get which params are required
 	} else if strings.HasPrefix(line, "G") || strings.HasPrefix(line,"M") {
 		c,l := extractCommand(line)
-		fmt.Println(c)
-		parseGcodeLine(l)
+		fmt.Print(c)
+		if l != "" {
+		        parseGcodeLine(l)
+		}
 	} else if strings.HasPrefix(line,"*"){
-		fmt.Println("is a checksum")
+		fmt.Print("is a checksum")
 	} else if strings.HasPrefix(line,";"){
-		fmt.Sprintf("Comment: %s\n",line)	
+		fmt.Print(line)	
 	} 
 }
 
