@@ -35,20 +35,25 @@ func readFileLBL(file_path string) {
 }
 
 func extractCommand(line string) (string, string) {
-	re := regexp.MustCompile(`^(.*?)\s?\*(.*)`)
+	checksumRe := regexp.MustCompile(`^(.*?)\s?\*(.*)`)
+	commentRe := regexp.MustCompile(`^(.*?)\s?;(.*)`)
 
 	// Find matches
-	matchChecksum := re.FindStringSubmatch(line)
+	matchChecksum := checksumRe.FindStringSubmatch(line)
+	matchComment := commentRe.FindStringSubmatch(line)
 
-	if len(matchChecksum) > 0 {
-		// Return the two segments as separate values
+	// Check if matchChecksum has the required elements
+	if len(matchChecksum) > 2 {
 		return matchChecksum[1], matchChecksum[2]
+	} else if len(matchComment) > 2 {
+		return matchComment[1], matchComment[2]
 	} else {
-		return "", "" // Return empty strings if no match
+		// Return empty strings if no match
+		return line, ""
 	}
 }
 
-//TODO: P:0 convert to extractLineNumber returning like extractCommand does
+
 func extractLineNumber(line string) (string, string) {
 	// Match line that starts with "N" followed by digits and an optional space
 	re := regexp.MustCompile(`^N(\d+)\s?(.*)`)
@@ -68,7 +73,8 @@ func parseGcodeLine(line string){
 	//TODO: P:0 convert string to struct
 	if strings.HasPrefix(line,"N"){
 		n,l := extractLineNumber(line)
-		fmt.Println(n)
+		n = n
+		//fmt.Println(n)
 		parseGcodeLine(l)
 	//TODO: P:1 Write lookup table for G/M codes to get which params are required
 	} else if strings.HasPrefix(line, "G") || strings.HasPrefix(line,"M") {
@@ -78,8 +84,8 @@ func parseGcodeLine(line string){
 	} else if strings.HasPrefix(line,"*"){
 		fmt.Println("is a checksum")
 	} else if strings.HasPrefix(line,";"){
-		fmt.Println("is a comment")
-	}
+		fmt.Sprintf("Comment: %s\n",line)	
+	} 
 }
 
 func main() {
