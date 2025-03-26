@@ -34,25 +34,49 @@ func readFileLBL(file_path string) {
     }
 }
 
-func removeLineNumber(input string) string {
-	// Define the regex pattern for the prefix 'N' followed by one or more digits and an optional space
-	re := regexp.MustCompile(`^N\d+\s?`)
-	// Replace the matched prefix with an empty string
-	return re.ReplaceAllString(input, "")
+func extractCommand(line string) (string, string) {
+	re := regexp.MustCompile(`^(.*?)\s?\*(.*)`)
+
+	// Find matches
+	matchChecksum := re.FindStringSubmatch(line)
+
+	if len(matchChecksum) > 0 {
+		// Return the two segments as separate values
+		return matchChecksum[1], matchChecksum[2]
+	} else {
+		return "", "" // Return empty strings if no match
+	}
+}
+
+//TODO: P:0 convert to extractLineNumber returning like extractCommand does
+func extractLineNumber(line string) (string, string) {
+	// Match line that starts with "N" followed by digits and an optional space
+	re := regexp.MustCompile(`^N(\d+)\s?(.*)`)
+
+	// Find matches
+	match := re.FindStringSubmatch(line)
+
+	if len(match) > 0 {
+		// Return the number and the remaining line as separate values
+		return match[1], match[2]
+	} else {
+		return "", "" // Return empty strings if no match
+	}
 }
 
 func parseGcodeLine(line string){
 	//TODO: P:0 convert string to struct
 	if strings.HasPrefix(line,"N"){
-		fmt.Println("--------------------")
-		fmt.Println("Line has line number")
-		fmt.Println("--------------------")
-		//l := removeLineNumber(line)
-		//parseGcodeLine(l)
-	} else if strings.HasPrefix(line, "G") {
-		fmt.Println("is a gcode")
-	} else if strings.HasPrefix(line,"M"){
-		fmt.Println("is a mcode")
+		n,l := extractLineNumber(line)
+		fmt.Println(n)
+		parseGcodeLine(l)
+	//TODO: P:1 Write lookup table for G/M codes to get which params are required
+	} else if strings.HasPrefix(line, "G") || strings.HasPrefix(line,"M") {
+		c,l := extractCommand(line)
+		fmt.Println(c)
+		parseGcodeLine(l)
+	} else if strings.HasPrefix(line,"*"){
+		fmt.Println("is a checksum")
 	} else if strings.HasPrefix(line,";"){
 		fmt.Println("is a comment")
 	}
