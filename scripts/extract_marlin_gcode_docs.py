@@ -36,9 +36,7 @@ def parse_tag_and_optional(filename):
             content = file.read()
 
             # Match all top-level blocks under 'parameters' section, capturing only the top-level 'tag' and 'optional' fields
-            blocks = re.findall(
-                r"-\s*tag:\s*(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)\s*.*?optional:\s*(\S+)(?=\s*-|\n)", content, re.DOTALL
-            )
+            blocks = re.findall(r"-\s*tag:\s*([A-Z])\s*.*?optional:\s*(\S+)(?=\s*-|\n)"  , content, re.DOTALL)
 
             for block in blocks:
                 tag = block[0]
