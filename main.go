@@ -11,6 +11,15 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+//TODO: P:0 migrate the parser to storing a slice of Commands
+type Command struct {
+    LineNumber *int    `json:"line_number,omitempty"` // Optional: LineNumber is a pointer
+    Command    string  `json:"command"`               // Required: Command is not optional
+    Parameters string  `json:"parameters"`            // Required: Parameters is not optional
+    Checksum   *string `json:"checksum,omitempty"`    // Optional: Checksum is a pointer
+    Comment    *string `json:"comment,omitempty"`     // Optional: Comment is a pointer
+}
+
 func readFileLBL(file_path string) {
     file, err := os.Open(file_path)
     if err != nil {
